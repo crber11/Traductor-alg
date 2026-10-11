@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reto Álgebra: Traductor Matemático</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&display=swap');
+
+        body {
+            background-color: #e3f2fd;
+            color: #333333;
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 { font-family: 'Fredoka One', cursive; letter-spacing: 1px; }
+        
+        h1 { color: #1565c0; font-size: 42px; text-align: center; margin-bottom: 5px; text-shadow: 2px 2px 0px #bbdefb; }
+        .subtitle { color: #555; font-size: 20px; text-align: center; margin-top: 0; margin-bottom: 30px; font-weight: 700; }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px;
+            box-sizing: border-box;
+            border: 3px solid #90caf9;
+        }
+
+        /* ----- PANTALLA DE INICIO ----- */
+        .theory-section {
+            background: #fff8e1;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 6px solid #ffb300;
+        }
+        
+        .theory-section h2 { color: #ff8f00; margin-top: 0; font-size: 26px; }
+        .theory-section p { font-size: 18px; color: #555; }
+        
+        .dictionary { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 16px; margin-top: 15px; }
+        .dict-item { background: #ffffff; padding: 12px 15px; border-radius: 10px; border: 2px solid #ffe082; box-shadow: 0 2px 5px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: center; }
+        .dict-item span { color: #1976d2; font-weight: 900; font-size: 19px; font-family: 'Fredoka One', cursive; text-align: right; }
+
+        .start-area {
+            text-align: center;
+            background: #e1f5fe;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px dashed #4fc3f7;
+        }
+
+        .name-input {
+            padding: 15px 20px;
+            font-size: 20px;
+            border-radius: 30px;
+            border: 3px solid #4fc3f7;
+            background: #ffffff;
+            color: #333;
+            text-align: center;
+            outline: none;
+            width: 70%;
+            max-width: 350px;
+            margin-bottom: 15px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: bold;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .name-input:focus { border-color: #0288d1; }
+
+        .btn-start {
+            background: #ff5252;
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 24px;
+            border-radius: 35px;
+            cursor: pointer;
+            font-family: 'Fredoka One', cursive;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            box-shadow: 0 6px 0 #d50000;
+        }
+        .btn-start:hover { transform: translateY(2px); box-shadow: 0 4px 0 #d50000; background: #ff1744; }
+        .btn-start:active { transform: translateY(6px); box-shadow: none; }
+
+        .ranking-area {
+            background: #f3e5f5;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #ce93d8;
+        }
+        .ranking-area h2 { color: #8e24aa; text-align: center; margin-top: 0; }
+        .ranking-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+        .ranking-table th, .ranking-table td { padding: 15px; text-align: center; border-bottom: 1px solid #f3e5f5; font-size: 19px; font-weight: bold; }
+        .ranking-table th { background: #ab47bc; color: white; text-transform: uppercase; font-size: 15px; }
+        .ranking-table tr:nth-child(1) td { color: #f57f17; font-size: 24px; background: #fffde7; }
+        .ranking-table tr:nth-child(2) td { color: #757575; background: #f5f5f5; }
+        .ranking-table tr:nth-child(3) td { color: #d84315; background: #fbe9e7; }
+
+        /* ----- PANTALLA DE JUEGO ----- */
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1976d2;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            font-size: 24px;
+            font-family: 'Fredoka One', cursive;
+            box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
+        }
+        .timer { color: #ffeb3b; }
+        .score { color: #69f0ae; }
+
+        .question-box {
+            background: #ffffff;
+            border: 4px solid #1976d2;
+            border-radius: 15px;
+            padding: 35px 20px;
+            font-size: 28px;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 30px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 0 #bbdefb;
+            color: #0d47a1;
+        }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .option-btn {
+            background: #ffffff;
+            border: 3px solid #90caf9;
+            border-radius: 15px;
+            color: #1565c0;
+            padding: 20px;
+            font-size: 26px;
+            font-family: 'Fredoka One', cursive;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-align: center;
+            box-shadow: 0 6px 0 #90caf9;
+        }
+        .option-btn:hover:not(:disabled) { background: #e3f2fd; border-color: #42a5f5; box-shadow: 0 6px 0 #42a5f5; transform: translateY(-2px); }
+        .option-btn:active:not(:disabled) { transform: translateY(6px); box-shadow: none; }
+        .option-btn:disabled { cursor: default; }
+
+        .correct { background: #4caf50 !important; color: white !important; border-color: #2e7d32 !important; box-shadow: 0 6px 0 #2e7d32 !important; transform: translateY(0) !important; }
+        .wrong { background: #f44336 !important; color: white !important; border-color: #c62828 !important; box-shadow: 0 6px 0 #c62828 !important; transform: translateY(0) !important; }
+
+        .btn-end-early {
+            background: #d32f2f; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 20px; cursor: pointer; margin-top: 25px; font-family: 'Fredoka One', cursive; transition: all 0.2s; box-shadow: 0 4px 0 #b71c1c; width: 100%; max-width: 300px; display: block; margin-left: auto; margin-right: auto;
+        }
+        .btn-end-early:hover { background: #f44336; transform: translateY(2px); box-shadow: 0 2px 0 #b71c1c; }
+        .btn-end-early:active { transform: translateY(4px); box-shadow: none; }
+
+        .hidden { display: none !important; }
+
+        /* ----- PANTALLA FINAL ----- */
+        .end-screen { text-align: center; padding: 40px 20px; }
+        .end-score { font-size: 70px; color: #1565c0; font-family: 'Fredoka One', cursive; margin: 20px 0; }
+        .end-msg { font-size: 26px; color: #555; margin-bottom: 40px; font-weight: bold; min-height: 60px;}
+
+        @media (max-width: 600px) {
+            .options-grid, .dictionary { grid-template-columns: 1fr; }
+            .question-box { font-size: 22px; padding: 20px; }
+            .option-btn { font-size: 22px; padding: 15px; }
+            .hud { flex-direction: column; gap: 10px; font-size: 20px; }
+            .dict-item { flex-direction: column; align-items: flex-start; }
+            .dict-item span { text-align: left; margin-top: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Reto Álgebra</h1>
+    <p class="subtitle">Traductor Matemático - Séptimo Grado</p>
+
+    <!-- PANTALLA PRINCIPAL (Menú) -->
+    <div class="container" id="menu-screen">
+        <div class="theory-section">
+            <h2>📚 Modelaje: ¿Cómo traducir a matemáticas?</h2>
+            <p>Lee atentamente las palabras clave. Ellas te indican qué operación usar:</p>
+            <div class="dictionary">
+                <div class="dict-item"><div>Un número <b>desconocido</b> (incógnita)</div> <span>Ej: x, y, m, etc.</span></div>
+                <div class="dict-item"><div>Aumentado, la suma, más</div> <span>+</span></div>
+                <div class="dict-item"><div>Disminuido, la diferencia, menos</div> <span>-</span></div>
+                <div class="dict-item"><div>El doble, el triple, 2 veces, 3 veces...</div> <span>2x, 3x</span></div>
+                <div class="dict-item"><div>La mitad, tercera parte, cuarta parte...</div> <span>x/2, x/3, x/4</span></div>
+                <div class="dict-item"><div>Es igual, equivale, resulta</div> <span>=</span></div>
+            </div>
+        </div>
+
+        <div class="start-area">
+            <h2 style="color:#0277bd; margin-top:0; font-size: 32px;">⏱️ Reto de 3 Minutos</h2>
+            <p style="color:#555; margin-bottom: 20px; font-size: 18px; font-weight:bold;">Acierta la mayor cantidad de ecuaciones. Ganas 10 puntos por acierto, pero pierdes tiempo si te equivocas.</p>
+            
+            <input type="text" id="playerName" class="name-input" placeholder="Tu nombre o apodo" maxlength="15" autocomplete="off">
+            <div id="nameError" style="color:#d32f2f; margin-bottom:15px; display:none; font-weight:bold;">¡Escribe un nombre válido y respetuoso!</div>
+            <br>
+            <button class="btn-start" onclick="startGame()">¡JUGAR AHORA!</button>
+        </div>
+
+        <div class="ranking-area">
+            <h2>🏆 TOP 5 MUNDIAL</h2>
+            <table class="ranking-table">
+                <thead><tr><th>Puesto</th><th>Nombre</th><th>Puntuación</th></tr></thead>
+                <tbody id="rankingBody">
+                    <tr><td colspan="3" style="color:#757575;">Cargando ranking en vivo...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE JUEGO -->
+    <div class="container hidden" id="game-screen">
+        <div class="hud">
+            <div>👤 <span id="displayPlayer"></span></div>
+            <div class="timer">⏱️ <span id="timeDisplay">03:00</span></div>
+            <div class="score">⭐ <span id="scoreDisplay">0</span> pts</div>
+        </div>
+
+        <div class="question-box" id="questionText">Cargando...</div>
+
+        <div class="options-grid" id="optionsGrid">
+            <button class="option-btn" id="btn-0" onclick="checkAnswer(0)">Opción 1</button>
+            <button class="option-btn" id="btn-1" onclick="checkAnswer(1)">Opción 2</button>
+            <button class="option-btn" id="btn-2" onclick="checkAnswer(2)">Opción 3</button>
+            <button class="option-btn" id="btn-3" onclick="checkAnswer(3)">Opción 4</button>
+        </div>
+        
+        <button class="btn-end-early" onclick="endGameEarly()">⏹️ Terminar Anticipadamente</button>
+    </div>
+
+    <!-- PANTALLA FINAL -->
+    <div class="container hidden" id="end-screen">
+        <div class="end-screen">
+            <h2 style="color: #ff5252; font-size: 42px;">¡TIEMPO TERMINADO!</h2>
+            <div class="end-score" id="finalScoreText">0 pts</div>
+            <div class="end-msg" id="endMessageText">Cargando resultados...</div>
+            <button class="btn-start" style="background:#1976d2; box-shadow: 0 6px 0 #0d47a1; margin-top:20px;" onclick="returnToMenu()">Ver Ranking</button>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================
+        // 1. CONFIGURACIÓN DEL RANKING EN FIREBASE
+        // =========================================================
+        // Usamos el MISMO enlace que ya creaste para todo tu colegio
+        const firebaseUrl = "https://rankingcolegio-default-rtdb.firebaseio.com"; 
+        // ¡Pero guardamos en esta nueva carpeta exclusiva para este juego!
+        const dbNode = "ranking_traductor.json"; 
+
+        async function loadRanking() {
+            let tbody = document.getElementById('rankingBody');
+            
+            try {
+                let url = firebaseUrl + '/' + dbNode;
+                let res = await fetch(url);
+                let data = await res.json();
+                
+                tbody.innerHTML = '';
+                
+                if (!data) {
+                    tbody.innerHTML = '<tr><td colspan="3" style="color:#757575;">Aún no hay puntajes. ¡Sé el primero!</td></tr>';
+                    return;
+                }
+
+                let entries = Object.values(data);
+                entries.sort((a, b) => b.score - a.score);
+                let top5 = entries.slice(0, 5);
+                
+                top5.forEach((entry, index) => {
+                    let medal = index === 0 ? '🥇' : (index === 1 ? '🥈' : (index === 2 ? '🥉' : index + 1));
+                    tbody.innerHTML += `<tr><td>${medal}</td><td>${entry.name}</td><td>${entry.score} pts</td></tr>`;
+                });
+
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="3" style="color:#f44336;">No se pudo conectar a la nube. Revisa tu internet.</td></tr>';
+                console.error(error);
+            }
+        }
+
+        async function checkAndSaveScore(finalScore) {
+            let msg = document.getElementById('endMessageText');
+            
+            if (finalScore === 0) {
+                msg.innerHTML = `Puntaje de 0 no se envía al ranking. <br>Revisa los conceptos iniciales e inténtalo de nuevo.`;
+                return;
+            }
+
+            msg.innerHTML = `Enviando tu puntaje a la nube... ☁️`;
+            msg.style.color = "#f57c00";
+
+            try {
+                let url = firebaseUrl + '/' + dbNode;
+                
+                await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify({ name: playerName, score: finalScore }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                setTimeout(async () => {
+                    await loadRanking();
+                    msg.innerHTML = `¡Puntaje enviado con éxito!<br>Ve al inicio para revisar la tabla mundial.`;
+                    msg.style.color = "#388e3c";
+                }, 1000);
+                
+            } catch (error) {
+                msg.innerHTML = `Lograste ${finalScore} puntos.<br><span style="color:#f44336;">Hubo un error de conexión al subir tu puntaje.</span>`;
+            }
+        }
+
+        // Cargar ranking al iniciar la página
+        loadRanking();
+
+        // =========================================================
+        // 2. BANCO DE DATOS (30 Preguntas)
+        // =========================================================
+        const allQuestions = [
+            { q: "Un número aumentado en cuatro es igual a once.", a: "x + 4 = 11", w: ["4x = 11", "x - 4 = 11", "x = 4 + 11"] },
+            { q: "El triple de un número más seis igual nueve.", a: "3x + 6 = 9", w: ["x + 6 = 9", "3(x + 6) = 9", "3x = 9 + 6"] },
+            { q: "La diferencia entre un número y ocho es igual a cinco.", a: "x - 8 = 5", w: ["8 - x = 5", "x + 8 = 5", "8x = 5"] },
+            { q: "El doble de un número disminuido 5 es igual a 11.", a: "2x - 5 = 11", w: ["x - 5 = 11", "2(x - 5) = 11", "2x + 5 = 11"] },
+            { q: "Un número aumentado en 2 equivale a 50.", a: "x + 2 = 50", w: ["2x = 50", "x - 2 = 50", "x/2 = 50"] },
+            { q: "El doble de un número equivale a 50.", a: "2x = 50", w: ["x^2 = 50", "x + 2 = 50", "x/2 = 50"] },
+            { q: "El doble de un número aumentado en 4 es igual a 40.", a: "2x + 4 = 40", w: ["2(x + 4) = 40", "x + 4 = 40", "2x - 4 = 40"] },
+            { q: "El doble de un número disminuido en 10 equivale a 4.", a: "2x - 10 = 4", w: ["x - 10 = 4", "2(x - 10) = 4", "2x + 10 = 4"] },
+            { q: "La mitad de un número es igual a quince.", a: "x / 2 = 15", w: ["2x = 15", "x - 2 = 15", "x + 15 = 2"] },
+            { q: "El cuádruple de un número disminuido en uno es igual a siete.", a: "4x - 1 = 7", w: ["x/4 - 1 = 7", "4(x - 1) = 7", "4x + 1 = 7"] },
+            { q: "Un número disminuido en nueve equivale a veinte.", a: "x - 9 = 20", w: ["9 - x = 20", "x + 9 = 20", "9x = 20"] },
+            { q: "El triple de un número equivale a treinta.", a: "3x = 30", w: ["x^3 = 30", "x + 3 = 30", "x / 3 = 30"] },
+            { q: "Un número disminuido en quince es igual a diez.", a: "x - 15 = 10", w: ["15 - x = 10", "x + 15 = 10", "15x = 10"] },
+            { q: "La tercera parte de un número es igual a ocho.", a: "x / 3 = 8", w: ["3x = 8", "x - 3 = 8", "3 / x = 8"] },
+            { q: "El doble de un número más diez es igual a veinte.", a: "2x + 10 = 20", w: ["2(x + 10) = 20", "x + 10 = 20", "2x - 10 = 20"] },
+            { q: "Dos veces un número equivale a catorce.", a: "2x = 14", w: ["x + 2 = 14", "x / 2 = 14", "x^2 = 14"] },
+            { q: "Tres veces un número aumentado en cinco resulta en veinte.", a: "3x + 5 = 20", w: ["3(x + 5) = 20", "x + 5 = 20", "3x - 5 = 20"] },
+            { q: "La cuarta parte de un número equivale a doce.", a: "x / 4 = 12", w: ["4x = 12", "x - 4 = 12", "x + 4 = 12"] },
+            { q: "Un número aumentado en doce es igual a treinta.", a: "x + 12 = 30", w: ["12x = 30", "x - 12 = 30", "30x = 12"] },
+            { q: "El quíntuple de un número es igual a cuarenta.", a: "5x = 40", w: ["x + 5 = 40", "x / 5 = 40", "x - 5 = 40"] },
+            { q: "La quinta parte de un número disminuida en dos es igual a seis.", a: "x / 5 - 2 = 6", w: ["5x - 2 = 6", "x / 5 + 2 = 6", "x / 2 - 5 = 6"] },
+            { q: "El triple de un número disminuido en ocho equivale a diez.", a: "3x - 8 = 10", w: ["3(x - 8) = 10", "x - 8 = 10", "3x + 8 = 10"] },
+            { q: "La suma de un número y quince resulta ser veinticinco.", a: "x + 15 = 25", w: ["15x = 25", "x - 15 = 25", "x / 15 = 25"] },
+            { q: "Cuatro veces un número más dos es igual a diez.", a: "4x + 2 = 10", w: ["4(x + 2) = 10", "x + 2 = 10", "4x - 2 = 10"] },
+            { q: "La mitad de un número aumentada en tres es igual a siete.", a: "x / 2 + 3 = 7", w: ["2x + 3 = 7", "x / 2 - 3 = 7", "x + 3 = 7"] },
+            { q: "La diferencia entre el doble de un número y cuatro equivale a dieciséis.", a: "2x - 4 = 16", w: ["4 - 2x = 16", "2(x - 4) = 16", "2x + 4 = 16"] },
+            { q: "Cinco veces un número disminuido en uno es catorce.", a: "5x - 1 = 14", w: ["5(x - 1) = 14", "x - 1 = 14", "5x + 1 = 14"] },
+            { q: "La sexta parte de un número resulta ser tres.", a: "x / 6 = 3", w: ["6x = 3", "x - 6 = 3", "x + 6 = 3"] },
+            { q: "Un número disminuido en veinte equivale a cincuenta.", a: "x - 20 = 50", w: ["20 - x = 50", "x + 20 = 50", "20x = 50"] },
+            { q: "El triple de un número aumentado en diez equivale a cuarenta.", a: "3x + 10 = 40", w: ["3(x + 10) = 40", "10x + 3 = 40", "3x - 10 = 40"] }
+        ];
+
+        // =========================================================
+        // 3. LÓGICA DEL JUEGO
+        // =========================================================
+        let score = 0;
+        let timeLeft = 180; // 3 minutos
+        let timerInterval;
+        let currentOptions = [];
+        let correctAnswerIndex = -1;
+        let questionPool = [];
+        let canClick = true;
+        let playerName = "";
+
+        const forbiddenWords = ["bobo", "tonto", "idiota", "estupido", "mierda", "puta", "puto", "culo", "cabron", "pendejo", "verga", "pito", "zorra", "perra", "marica", "imbecil", "pene", "vagina"];
+
+        function isValidName(name) {
+            let n = name.toLowerCase().replace(/\s+/g, '');
+            for (let word of forbiddenWords) {
+                if (n.includes(word)) return false;
+            }
+            return true;
+        }
+
+        function startGame() {
+            let inputName = document.getElementById('playerName').value.trim();
+            let errorDiv = document.getElementById('nameError');
+            
+            if (inputName === "") {
+                errorDiv.innerText = "⚠️ Escribe tu nombre para participar en el ranking.";
+                errorDiv.style.display = "block";
+                document.getElementById('playerName').focus();
+                return;
+            }
+            if (!isValidName(inputName)) {
+                errorDiv.innerText = "🛑 Nombre no permitido. Usa tu nombre real.";
+                errorDiv.style.display = "block";
+                document.getElementById('playerName').value = "";
+                return;
+            }
+            
+            errorDiv.style.display = "none";
+            playerName = inputName;
+            
+            score = 0;
+            timeLeft = 180; 
+            questionPool = [...allQuestions]; 
+            
+            document.getElementById('displayPlayer').innerText = playerName;
+            document.getElementById('scoreDisplay').innerText = score;
+            updateTimerDisplay();
+
+            document.getElementById('menu-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            loadNextQuestion();
+            timerInterval = setInterval(timerTick, 1000);
+        }
+
+        function loadNextQuestion() {
+            canClick = true;
+            for(let i=0; i<4; i++) {
+                let btn = document.getElementById(`btn-${i}`);
+                btn.className = 'option-btn';
+                btn.disabled = false;
+            }
+
+            if (questionPool.length === 0) {
+                questionPool = [...allQuestions];
+            }
+
+            let qIndex = Math.floor(Math.random() * questionPool.length);
+            let qData = questionPool.splice(qIndex, 1)[0];
+
+            document.getElementById('questionText').innerText = qData.q;
+
+            let options = [qData.a, ...qData.w];
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+
+            currentOptions = options;
+            for(let i=0; i<4; i++) {
+                document.getElementById(`btn-${i}`).innerText = options[i];
+                if(options[i] === qData.a) {
+                    correctAnswerIndex = i;
+                }
+            }
+        }
+
+        function checkAnswer(selectedIndex) {
+            if (!canClick) return;
+            canClick = false; 
+
+            let selectedBtn = document.getElementById(`btn-${selectedIndex}`);
+            let correctBtn = document.getElementById(`btn-${correctAnswerIndex}`);
+
+            for(let i=0; i<4; i++) document.getElementById(`btn-${i}`).disabled = true;
+
+            if (selectedIndex === correctAnswerIndex) {
+                selectedBtn.classList.add('correct');
+                score += 10;
+                document.getElementById('scoreDisplay').innerText = score;
+                setTimeout(loadNextQuestion, 600); 
+            } else {
+                selectedBtn.classList.add('wrong');
+                correctBtn.classList.add('correct');
+                timeLeft = timeLeft >= 3 ? timeLeft - 3 : 0; 
+                setTimeout(loadNextQuestion, 1800); 
+            }
+        }
+
+        function timerTick() {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateTimerDisplay();
+            } else {
+                clearInterval(timerInterval);
+                finishGame();
+            }
+        }
+
+        function updateTimerDisplay() {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timeDisplay').innerText = `0${m}:${s < 10 ? '0'+s : s}`;
+            
+            if(timeLeft <= 10) {
+                document.getElementById('timeDisplay').style.color = '#ff5252';
+            } else {
+                document.getElementById('timeDisplay').style.color = '#ffeb3b';
+            }
+        }
+
+        function endGameEarly() {
+            clearInterval(timerInterval);
+            finishGame();
+        }
+
+        function finishGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('hidden');
+            document.getElementById('finalScoreText').innerText = score + " pts";
+            document.getElementById('endMessageText').innerText = "Procesando...";
+            
+            checkAndSaveScore(score);
+        }
+
+        function returnToMenu() {
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('menu-screen').classList.remove('hidden');
+            document.getElementById('playerName').value = ""; 
+        }
+    </script>
+</body>
+</html>
